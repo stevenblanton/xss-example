@@ -1,5 +1,6 @@
 import os
 import base64
+import html
 
 from flask import Flask, request
 from model import Message 
@@ -10,7 +11,9 @@ app = Flask(__name__)
 def home():
 
     if request.method == 'POST':
-        m = Message(content=request.form['content'])
+        req_content = html.escape(request.form['content'])
+        print(req_content)
+        m = Message(content=req_content)
         m.save()
 
     body = """
@@ -27,13 +30,14 @@ def home():
 """
     
     for m in Message.select():
+        s = html.escape(m.content)
         body += """
 <div class="message">
 {}
 </div>
-""".format(m.content)
+""".format(s)
 
-    return body 
+    return body
 
 
 if __name__ == "__main__":
